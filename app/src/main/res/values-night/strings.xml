@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="str_err_password_edt">Minimal 6 karakter</string>
+    <string name="str_err_email_edt">Format email salah</string>
+</resources>
