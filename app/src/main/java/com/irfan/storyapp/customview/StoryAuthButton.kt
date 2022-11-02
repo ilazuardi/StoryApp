@@ -37,6 +37,6 @@ class StoryAuthButton : AppCompatButton {
         setTextColor(txtColor)
         textSize = 12f
         gravity = Gravity.CENTER
-        text = if (isEnabled) textIsEnabled else "Lengkapi Inputan"
+        text = if (isEnabled) textIsEnabled else context.getString(R.string.str_complete_form)
     }
 }

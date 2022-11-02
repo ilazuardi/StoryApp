@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Story App</string>
     <string name="password">Password</string>
@@ -6,4 +7,27 @@
     <string name="str_err_email_edt">Format email salah</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="name">Name</string>
+    <string name="str_complete_form">Complete the forms</string>
+    <string name="str_title_login">Already have an Account ?</string>
+    <string name="str_desc_login">Hello! Please sign in if you want to continue.</string>
+    <string name="str_button_to_register_in_login_page">Don\'t have an account ? <font fgcolor='#E65100'>Sign Up</font></string>
+    <string name="str_sign_in">Sign in</string>
+    <string name="str_title_register">Let\'s Get Started!</string>
+    <string name="str_desc_register">Create an account to explore The Story</string>
+    <string name="str_sign_up">Sign up</string>
+    <string name="str_button_to_login_in_register_page">Already have an account ? <font fgcolor='#303F9F'>Login Here</font></string>
+    <string name="description">Description</string>
+    <string name="title">Title</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="upload">Upload</string>
+    <string name="post">Post</string>
+    <string name="information">Information</string>
+    <string name="str_field_required">%1$s is required</string>
+    <string name="add">add</string>
+    <string name="logout">Logout</string>
+    <string name="str_please_wait">Please wait</string>
+    <string name="str_data_being_processed">Your data is being processed</string>
+    <string name="str_login_failed">Login Failed</string>
 </resources>

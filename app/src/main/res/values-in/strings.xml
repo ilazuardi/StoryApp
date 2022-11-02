@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Story App</string>
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="str_err_password_edt">Minimal 6 Karakter</string>
+    <string name="str_err_email_edt">Format Email Salah</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="name">Nama</string>
+    <string name="str_complete_form">Lengkapi form diatas</string>
+    <string name="str_title_login">Sudah memiliki akun ?</string>
+    <string name="str_desc_login">Halo! Mohon masuk untuk melanjutkan.</string>
+    <string name="str_button_to_register_in_login_page">Tidak punya akun ? <font fgcolor='#E65100'>Daftar</font></string>
+    <string name="str_sign_in">Masuk</string>
+    <string name="str_title_register">Ayo Mulai!</string>
+    <string name="str_desc_register">Buat akun untuk bereksplorasi di The Story</string>
+    <string name="str_sign_up">Daftar</string>
+    <string name="str_button_to_login_in_register_page">Sudah punya akun ? <font fgcolor='#303F9F'>Masuk sini</font></string>
+    <string name="description">Deskripsi</string>
+    <string name="title">Judul</string>
+    <string name="camera">Kamera</string>
+    <string name="gallery">Galeri</string>
+    <string name="upload">Unggah</string>
+    <string name="post">Post</string>
+    <string name="information">Informasi</string>
+    <string name="str_field_required">%1$s diperlukan </string>
+    <string name="add">Tambah</string>
+    <string name="logout">Keluar</string>
+    <string name="str_please_wait">Mohon Tunggu</string>
+    <string name="str_data_being_processed">Data kamu sedang di proses</string>
+    <string name="str_login_failed">Login Gagal</string>
+</resources>

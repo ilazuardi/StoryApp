@@ -1,14 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.register.RegisterFragment">
+    android:background="@color/blue_500"
+    app:layoutDescription="@xml/fragment_register_scene"
+    tools:context=".ui.authentication.register.RegisterFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:id="@+id/label_signup_register_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="20dp"
+        android:text="@string/str_sign_up"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/background_register_view"
+        app:layout_constraintStart_toStartOf="parent" />
 
-</FrameLayout>
+    <View
+        android:id="@+id/background_register_view"
+        android:layout_width="0dp"
+        android:layout_height="500dp"
+        android:background="@drawable/bg_white_rounded"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/label_title_register_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/str_title_register"
+        android:textColor="@color/blue_900"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/background_register_view"
+        app:layout_constraintStart_toStartOf="@+id/background_register_view"
+        app:layout_constraintTop_toTopOf="@+id/background_register_view" />
+
+    <TextView
+        android:id="@+id/label_desc_register_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="5dp"
+        android:text="@string/str_desc_register"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/label_title_register_tv"
+        app:layout_constraintStart_toStartOf="@+id/label_title_register_tv"
+        app:layout_constraintTop_toBottomOf="@+id/label_title_register_tv"
+        tools:ignore="TextContrastCheck" />
+
+    <com.irfan.storyapp.customview.StoryDefaultEditText
+        android:id="@+id/ed_register_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="30dp"
+        android:drawableStart="@drawable/custom_ic_account_box"
+        android:hint="@string/name"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="@+id/background_register_view"
+        app:layout_constraintStart_toStartOf="@+id/background_register_view"
+        app:layout_constraintTop_toBottomOf="@+id/label_desc_register_tv" />
+
+    <com.irfan.storyapp.customview.StoryEmailEditText
+        android:id="@+id/ed_register_email"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="15dp"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="@+id/background_register_view"
+        app:layout_constraintStart_toStartOf="@+id/background_register_view"
+        app:layout_constraintTop_toBottomOf="@+id/ed_register_name"
+        tools:ignore="TextContrastCheck" />
+
+    <com.irfan.storyapp.customview.StoryPasswordEditText
+        android:id="@+id/ed_register_password"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="15dp"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="@+id/background_register_view"
+        app:layout_constraintStart_toStartOf="@+id/background_register_view"
+        app:layout_constraintTop_toBottomOf="@+id/ed_register_email"
+        tools:ignore="TextContrastCheck" />
+
+    <com.irfan.storyapp.customview.StoryAuthButton
+        android:id="@+id/register_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:enabled="false"
+        app:layout_constraintEnd_toEndOf="@+id/ed_register_name"
+        app:layout_constraintStart_toStartOf="@+id/ed_register_name"
+        app:layout_constraintTop_toBottomOf="@+id/ed_register_password" />
+
+    <TextView
+        android:id="@+id/label_login_register_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginBottom="15dp"
+        android:text="@string/str_button_to_login_in_register_page"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/background_register_view"
+        app:layout_constraintEnd_toEndOf="@+id/background_register_view"
+        app:layout_constraintStart_toStartOf="@+id/background_register_view"
+        tools:ignore="TextContrastCheck" />
+
+</androidx.constraintlayout.motion.widget.MotionLayout>

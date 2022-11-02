@@ -20,6 +20,7 @@ class StoryPasswordEditText : AppCompatEditText, OnTouchListener {
     private lateinit var lockImage: Drawable
     private lateinit var hideOrShowTextButtonImage: Drawable
     private var isPasswordHide = true
+    var isValidate = false
 
     constructor(context: Context) : super(context) {
         init()
@@ -48,8 +49,9 @@ class StoryPasswordEditText : AppCompatEditText, OnTouchListener {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s?.length!! < 6) {
+                    isValidate = false
                     setError(context.getString(R.string.str_err_password_edt), hideOrShowTextButtonImage)
-                }
+                } else isValidate = true
             }
 
             override fun afterTextChanged(s: Editable?) {

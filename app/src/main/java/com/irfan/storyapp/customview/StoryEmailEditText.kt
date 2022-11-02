@@ -14,6 +14,7 @@ import com.irfan.storyapp.R
 class StoryEmailEditText : AppCompatEditText {
 
     private lateinit var emailImage: Drawable
+    var isValidate: Boolean = false
 
     constructor(context: Context) : super(context) {
         init()
@@ -39,7 +40,10 @@ class StoryEmailEditText : AppCompatEditText {
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if (!android.util.Patterns.EMAIL_ADDRESS.matcher(p0!!).matches()) {
-                    setError(context.getString(R.string.str_err_email_edt), emailImage)
+                    error = context.getString(R.string.str_err_email_edt)
+                    isValidate = false
+                } else {
+                    isValidate = true
                 }
             }
 
