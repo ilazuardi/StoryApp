@@ -37,4 +37,9 @@ class DetailActivity : AppCompatActivity() {
         super.onDestroy()
         binding = null
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
+    }
 }
