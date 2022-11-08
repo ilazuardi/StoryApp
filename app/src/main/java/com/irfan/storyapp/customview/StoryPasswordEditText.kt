@@ -50,7 +50,10 @@ class StoryPasswordEditText : AppCompatEditText, OnTouchListener {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s?.length!! < 6) {
                     isValidate = false
-                    setError(context.getString(R.string.str_err_password_edt), hideOrShowTextButtonImage)
+                    setError(
+                        context.getString(R.string.str_err_password_edt),
+                        hideOrShowTextButtonImage
+                    )
                 } else isValidate = true
             }
 

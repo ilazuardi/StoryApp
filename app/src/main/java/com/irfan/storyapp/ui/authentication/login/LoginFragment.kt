@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.irfan.storyapp.MainActivity
 import com.irfan.storyapp.R
@@ -18,7 +17,6 @@ import com.irfan.storyapp.data.preferences.UserPreferences
 import com.irfan.storyapp.databinding.FragmentLoginBinding
 import com.irfan.storyapp.ui.authentication.register.RegisterFragment
 import com.irfan.storyapp.ui.home.HomeFragment
-import kotlin.math.log
 
 class LoginFragment : Fragment() {
 
@@ -120,7 +118,10 @@ class LoginFragment : Fragment() {
     }
 
     private fun initViewModel() {
-        loginViewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[LoginViewModel::class.java]
+        loginViewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.NewInstanceFactory()
+        )[LoginViewModel::class.java]
 
         loginViewModel.apply {
             message.observe(viewLifecycleOwner) {
@@ -154,7 +155,8 @@ class LoginFragment : Fragment() {
     private fun setStoryAuthButtonEnable() {
         binding.apply {
             loginBtn.isEnabled = edLoginEmail.isValidate && edLoginPassword.isValidate
-            loginBtn.textIsEnabled = if (loginBtn.isEnabled) getString(R.string.str_sign_in) else getString(R.string.str_complete_form)
+            loginBtn.textIsEnabled =
+                if (loginBtn.isEnabled) getString(R.string.str_sign_in) else getString(R.string.str_complete_form)
         }
     }
 

@@ -10,7 +10,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class HomeViewModel: ViewModel() {
+class HomeViewModel : ViewModel() {
 
     private val _stories = MutableLiveData<ArrayList<ListStoryItem>>()
     val stories: LiveData<ArrayList<ListStoryItem>> = _stories

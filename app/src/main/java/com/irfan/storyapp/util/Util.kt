@@ -14,10 +14,15 @@ object Util {
 
     fun createTempFile(context: Context): File {
         val storageDir: File? = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH).format(System.currentTimeMillis()), ".jpg", storageDir)
+        return File.createTempFile(
+            SimpleDateFormat(
+                "dd-MM-yyyy",
+                Locale.ENGLISH
+            ).format(System.currentTimeMillis()), ".jpg", storageDir
+        )
     }
 
-    fun uriToFile(selectedImg: Uri, context : Context): File {
+    fun uriToFile(selectedImg: Uri, context: Context): File {
         val contentResolver: ContentResolver = context.contentResolver
         val myFile = createTempFile(context)
 

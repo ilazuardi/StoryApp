@@ -74,7 +74,7 @@
                 android:text="@string/description"
                 android:textSize="14sp"
                 android:maxLines="8"
-                android:transitionName="description" />
+                android:transitionName="desc" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

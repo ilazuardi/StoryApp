@@ -6,7 +6,6 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -17,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
-import com.irfan.storyapp.MainActivity
 import com.irfan.storyapp.data.model.remote.story.add.NewStoryResponse
 import com.irfan.storyapp.data.network.ApiConfig
 import com.irfan.storyapp.data.preferences.UserPreferences
@@ -167,16 +165,25 @@ class NewPostActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val responseBody = response.body()
                         if (responseBody != null && !responseBody.error) {
-                            Toast.makeText(this@NewPostActivity, responseBody.message, Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                this@NewPostActivity,
+                                responseBody.message,
+                                Toast.LENGTH_LONG
+                            ).show()
                             onBackPressed()
                         } else {
-                            Toast.makeText(this@NewPostActivity, response.message(), Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                this@NewPostActivity,
+                                response.message(),
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
                 }
 
                 override fun onFailure(call: Call<NewStoryResponse>, t: Throwable) {
-                    Toast.makeText(this@NewPostActivity, t.message.toString(), Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@NewPostActivity, t.message.toString(), Toast.LENGTH_LONG)
+                        .show()
                 }
 
             })

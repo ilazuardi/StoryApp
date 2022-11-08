@@ -27,4 +27,4 @@ data class ListStoryItem(
 
     @field:SerializedName("lat")
     val lat: Double
-): Parcelable
+) : Parcelable

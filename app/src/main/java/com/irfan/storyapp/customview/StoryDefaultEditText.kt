@@ -2,7 +2,6 @@ package com.irfan.storyapp.customview
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.drawable.Drawable
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
@@ -15,13 +14,21 @@ class StoryDefaultEditText : AppCompatEditText {
 
     var typeFieldText: String = "Field"
 
-    constructor(context: Context) : super(context) { init() }
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) { init() }
+    constructor(context: Context) : super(context) {
+        init()
+    }
+
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        init()
+    }
+
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
         defStyleAttr
-    ) { init() }
+    ) {
+        init()
+    }
 
     private fun init() {
         addTextChangedListener(object : TextWatcher {

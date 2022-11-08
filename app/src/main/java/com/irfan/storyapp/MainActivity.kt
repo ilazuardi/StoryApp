@@ -1,10 +1,10 @@
 package com.irfan.storyapp
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId) {
+        return when (item.itemId) {
             R.id.logout_menu -> {
                 userPref.logout()
                 moveToFragment(LoginFragment())
@@ -62,7 +62,9 @@ class MainActivity : AppCompatActivity() {
                 FragmentManager.POP_BACK_STACK_INCLUSIVE
                 true
             }
-            else -> {return super.onOptionsItemSelected(item)}
+            else -> {
+                return super.onOptionsItemSelected(item)
+            }
         }
     }
 }

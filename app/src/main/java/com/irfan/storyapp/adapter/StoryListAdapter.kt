@@ -5,28 +5,29 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.util.Pair
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.irfan.storyapp.data.model.remote.story.list.ListStoryItem
 import com.irfan.storyapp.databinding.ItemListStoryBinding
 import com.irfan.storyapp.ui.detail.DetailActivity
-import androidx.core.util.Pair
-import androidx.recyclerview.widget.DiffUtil
 
 class StoryListAdapter : RecyclerView.Adapter<StoryListAdapter.ViewHolder>() {
 
     private val listStory = ArrayList<ListStoryItem>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : ViewHolder =
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
         ViewHolder(ItemListStoryBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(listStory[position  ])
+        holder.bind(listStory[position])
     }
 
     override fun getItemCount(): Int = listStory.size
 
-    inner class ViewHolder(private val binding: ItemListStoryBinding): RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(private val binding: ItemListStoryBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(story: ListStoryItem) {
             binding.apply {

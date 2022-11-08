@@ -12,7 +12,8 @@ class StoryDiffCallback(
 
     override fun getNewListSize(): Int = newListStories.size
 
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean = oldListStories[oldItemPosition] == newListStories[newItemPosition]
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+        oldListStories[oldItemPosition] == newListStories[newItemPosition]
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         val oldStory = oldListStories[oldItemPosition]
