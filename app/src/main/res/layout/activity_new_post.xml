@@ -11,15 +11,31 @@
         android:id="@+id/image_add_iv"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:alpha="0"
         android:background="@drawable/bg_border_dashed"
-        app:layout_constraintBottom_toTopOf="@+id/camera_add_btn"
+        android:padding="100dp"
+        app:layout_constraintBottom_toTopOf="@+id/sm_location"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:padding="100dp"
-        android:alpha="0"
-        tools:alpha="1"
-        app:srcCompat="@drawable/ic_baseline_add_photo_alternate_24" />
+        app:srcCompat="@drawable/ic_baseline_add_photo_alternate_24"
+        tools:alpha="1" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/sm_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/gallery_add_btn"
+        app:layout_constraintEnd_toEndOf="@+id/gallery_add_btn" />
+
+    <TextView
+        android:id="@+id/tv_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Post with your location ?"
+        app:layout_constraintBottom_toBottomOf="@+id/sm_location"
+        app:layout_constraintStart_toStartOf="@+id/camera_add_btn"
+        app:layout_constraintTop_toTopOf="@+id/sm_location" />
 
     <Button
         android:id="@+id/camera_add_btn"

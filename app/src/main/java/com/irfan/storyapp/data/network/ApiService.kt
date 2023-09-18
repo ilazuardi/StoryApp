@@ -13,8 +13,11 @@ interface ApiService {
 
     @GET("stories")
     fun getStories(
-        @Header("Authorization") token: String
-    ): Call<ListStoryResponse>
+        @Header("Authorization") token: String,
+        @Query("page") page: Int? = null,
+        @Query("size") size: Int? = null,
+        @Query("location") location: Int? = null
+    ): ListStoryResponse
 
     @FormUrlEncoded
     @POST("register")
@@ -22,20 +25,22 @@ interface ApiService {
         @Field("name") name: String,
         @Field("email") email: String,
         @Field("password") password: String
-    ): Call<RegisterResponse>
+    ): RegisterResponse
 
     @FormUrlEncoded
     @POST("login")
     fun postLogin(
         @Field("email") email: String,
         @Field("password") password: String
-    ): Call<LoginResponse>
+    ): LoginResponse
 
     @Multipart
     @POST("stories")
     fun postStory(
         @Header("Authorization") token: String,
         @Part file: MultipartBody.Part,
-        @Part("description") description: RequestBody
-    ): Call<NewStoryResponse>
+        @Part("description") description: RequestBody,
+        @Part("lat") lat: RequestBody?,
+        @Part("lon") lon: RequestBody?
+    ): NewStoryResponse
 }

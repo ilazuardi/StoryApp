@@ -30,4 +30,12 @@
     <string name="str_please_wait">Mohon Tunggu</string>
     <string name="str_data_being_processed">Data kamu sedang di proses</string>
     <string name="str_login_failed">Login Gagal</string>
+    <string name="home">Beranda</string>
+    <string name="location">Lokasi</string>
+    <string name="date_format_example">00/00/00</string>
+    <string name="retry">Ulangi</string>
+    <string name="activate_location_msg">Kamu butuh mengaktifkan layanan lokasimu !</string>
+    <string name="alert_empty_field_desc">Mohon untuk mengisi deskripsi terlebih dahulu !</string>
+    <string name="iv_data_is_empty">Gambar untuk tidak ada data</string>
+    <string name="str_stories_is_empty">List story kosong atau error</string>
 </resources>

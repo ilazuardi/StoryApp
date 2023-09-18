@@ -7,20 +7,31 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.irfan.storyapp.MainActivity
+import androidx.recyclerview.widget.RecyclerView
+import com.irfan.storyapp.adapter.LoadingStateAdapter
+import com.irfan.storyapp.ui.main.MainActivity
 import com.irfan.storyapp.adapter.StoryListAdapter
+import com.irfan.storyapp.data.model.local.Story
 import com.irfan.storyapp.databinding.FragmentHomeBinding
+import java.lang.NullPointerException
 
+@ExperimentalPagingApi
 class HomeFragment : Fragment() {
 
     private val TAG: String = HomeFragment::class.java.simpleName
 
     private var _binding: FragmentHomeBinding? = null
+
+    private var token: String = ""
     private val binding get() = _binding!!
 
     private lateinit var homeViewModel: HomeViewModel
 
+    private lateinit var storyRv: RecyclerView
     private lateinit var storyListAdapter: StoryListAdapter
 
     override fun onCreateView(
@@ -29,50 +40,72 @@ class HomeFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         _binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
+        token = (activity as MainActivity).getSaveToken()
+        Log.d(TAG, "onCreateView: Token = $token")
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        storyListAdapter = StoryListAdapter()
-        initViewModel()
-        configStoryList(storyListAdapter)
+
+        setOnRefreshData()
+        configStoryList()
+        getAllStories()
         (activity as MainActivity).supportActionBar?.apply {
             title = "Home"
             show()
         }
     }
 
-    private fun initViewModel() {
-        homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+    private fun getAllStories() {
+        homeViewModel.getAllStories(token).observe(viewLifecycleOwner) { stories ->
+            updateData(stories)
+        }
+    }
 
-        homeViewModel.apply {
+    private fun updateData(stories: PagingData<Story>) {
+        val recyclerViewState = storyRv.layoutManager?.onSaveInstanceState()
 
-            getAllStories((activity as MainActivity).userPref.getUser().token)
-            isLoading.observe(viewLifecycleOwner) {
-                showLoading(it)
-            }
-            stories.observe(viewLifecycleOwner) {
-                if (it != null) {
-                    storyListAdapter.setListStories(it)
+        storyListAdapter.submitData(lifecycle, stories)
+        storyRv.layoutManager?.onRestoreInstanceState(recyclerViewState)
+    }
+
+    private fun setOnRefreshData() {
+        binding.srlRefresh.setOnRefreshListener {
+            getAllStories()
+        }
+    }
+
+    private fun configStoryList() {
+        storyListAdapter = StoryListAdapter()
+        storyListAdapter.addLoadStateListener { state ->
+            val paginationDataState = (state.source.refresh is LoadState.NotLoading && state.append.endOfPaginationReached && storyListAdapter.itemCount < 1) || state.source.refresh is LoadState.Error
+            binding.apply {
+                if (paginationDataState) {
+                    tvStoriesEmpty.visibility = View.VISIBLE
+                    ivStoriesEmpty.visibility = View.VISIBLE
+                    storyListRv.visibility = View.GONE
+                } else {
+                    tvStoriesEmpty.visibility = View.GONE
+                    ivStoriesEmpty.visibility = View.GONE
+                    storyListRv.visibility = View.VISIBLE
                 }
-            }
-            message.observe(viewLifecycleOwner) {
-                Log.d(TAG, "Message = $it")
+                srlRefresh.isRefreshing = state.source.refresh is LoadState.Loading
             }
         }
-    }
-
-    private fun configStoryList(storyAdapter: StoryListAdapter) {
-        binding.storyListRv.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            setHasFixedSize(true)
-            adapter = storyAdapter
+        try {
+            storyRv = binding.storyListRv
+            storyRv.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = storyListAdapter.withLoadStateFooter(
+                    footer = LoadingStateAdapter {
+                        storyListAdapter.retry()
+                    }
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-    }
-
-    private fun showLoading(isLoading: Boolean) {
-        binding.loadingHomePb.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 
     override fun onDetach() {
@@ -80,5 +113,8 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

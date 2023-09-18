@@ -3,19 +3,22 @@ package com.irfan.storyapp.ui.authentication.register
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.irfan.storyapp.MainActivity
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.ExperimentalPagingApi
 import com.irfan.storyapp.R
 import com.irfan.storyapp.databinding.FragmentRegisterBinding
 import com.irfan.storyapp.ui.authentication.login.LoginFragment
+import com.irfan.storyapp.ui.main.MainActivity
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
+@ExperimentalPagingApi
 class RegisterFragment : Fragment() {
 
     private var _binding: FragmentRegisterBinding? = null
@@ -23,9 +26,11 @@ class RegisterFragment : Fragment() {
 
     private lateinit var loadingDialog: AlertDialog
 
-    private val TAG = RegisterFragment::class.java.simpleName
+    private val TAG = this::class.java.simpleName
 
-    private lateinit var registerViewModel: RegisterViewModel
+    private var registerJob: Job = Job()
+
+    private val registerViewModel: RegisterViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,7 +38,6 @@ class RegisterFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         _binding = FragmentRegisterBinding.inflate(layoutInflater, container, false)
-        initViewModel()
         initView()
         return binding.root
     }
@@ -102,43 +106,39 @@ class RegisterFragment : Fragment() {
     }
 
     private fun doRegister(email: String, name: String, password: String) {
-        registerViewModel.register(email, name, password)
-    }
+        setLoadingState(true)
+        lifecycleScope.launchWhenResumed {
+            if (registerJob.isActive) registerJob.cancel()
 
-    private fun initViewModel() {
-        registerViewModel = ViewModelProvider(this)[RegisterViewModel::class.java]
-
-        registerViewModel.apply {
-            message.observe(viewLifecycleOwner) {
-                Log.d(TAG, "Message = $it")
-                Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
-                if (it == "User created") {
-                    (activity as MainActivity).moveToFragment(LoginFragment())
-                }
-            }
-            isLoading.observe(requireActivity()) {
-                Log.d(TAG, "Loading = $it")
-                if (it) {
-                    loadingDialog.show()
-                    binding.registerBtn.textIsEnabled = getString(R.string.str_please_wait) + "..."
-                } else {
-                    loadingDialog.dismiss()
-                    binding.registerBtn.textIsEnabled = getString(R.string.str_sign_up)
-                }
-
-            }
-            error.observe(viewLifecycleOwner) {
-                Log.d(TAG, "error : $it")
-                if (it) {
-                    AlertDialog.Builder(requireContext()).apply {
-                        setTitle("Register Failed")
-                        setMessage("Please try again later !")
-                        setPositiveButton("OK") { dialog, _ ->
-                            dialog.cancel()
-                            dialog.dismiss()
+            registerJob = launch {
+                registerViewModel.register(email, name, password).collect { result ->
+                    result.onSuccess { response ->
+                        setLoadingState(false)
+                        response.message.let { message ->
+                            AlertDialog.Builder(requireContext()).apply {
+                                setTitle("Register Successfully")
+                                setMessage(message)
+                                setPositiveButton("OK") { _, _ ->
+                                    (activity as MainActivity).moveToFragment(LoginFragment())
+                                }
+                                create()
+                                show()
+                            }
                         }
-                        create()
-                        show()
+
+                    }
+                    result.onFailure {
+                        setLoadingState(false)
+                        AlertDialog.Builder(requireContext()).apply {
+                            setTitle("Register Failed")
+                            setMessage("Please try again later !")
+                            setPositiveButton("OK") { dialog, _ ->
+                                dialog.cancel()
+                                dialog.dismiss()
+                            }
+                            create()
+                            show()
+                        }
                     }
                 }
             }
@@ -161,5 +161,15 @@ class RegisterFragment : Fragment() {
             setCancelable(false)
         }
         loadingDialog = loadingDialogBuilder.create()
+    }
+
+    private fun setLoadingState(isLoading: Boolean) {
+        if (isLoading) {
+            loadingDialog.show()
+            binding.registerBtn.textIsEnabled = getString(R.string.str_please_wait) + "..."
+        } else {
+            loadingDialog.dismiss()
+            binding.registerBtn.textIsEnabled = getString(R.string.str_sign_up)
+        }
     }
 }

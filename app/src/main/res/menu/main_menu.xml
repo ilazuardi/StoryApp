@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/location_menu"
+        android:title="@string/logout"
+        android:icon="@drawable/baseline_share_location_24"
+        app:showAsAction="ifRoom|withText"/>
+
+    <item
         android:id="@+id/add_story_menu"
         android:title="@string/add"
         android:icon="@drawable/ic_baseline_post_add_24"

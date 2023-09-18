@@ -1,46 +1,27 @@
 package com.irfan.storyapp.data.preferences
 
-import android.content.Context
-import com.irfan.storyapp.data.model.local.UserSession
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
-class UserPreferences(context: Context) {
+class UserPreferences @Inject constructor(private val dataStore: DataStore<Preferences>){
+
     companion object {
-        private const val PREF_NAME = "user_pref"
-        private const val KEY_USER_ID = "user_id"
-        private const val KEY_NAME = "name"
-        private const val KEY_TOKEN = "token"
-        private const val KEY_LOG_STATUS = "log_status"
-
+        private val TOKEN_KEY = stringPreferencesKey("token_data")
     }
 
-    private val pref = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-    private val editor = pref.edit()
-
-    fun setUser(session: UserSession) {
-        editor.apply {
-            putString(KEY_USER_ID, session.userId)
-            putString(KEY_NAME, session.name)
-            putString(KEY_TOKEN, session.token)
-            putBoolean(KEY_LOG_STATUS, session.isLogin)
-            apply()
+    fun getUserToken(): Flow<String?> {
+        return dataStore.data.map { preferences ->
+            preferences[TOKEN_KEY]
         }
     }
 
-    fun getUser(): UserSession =
-        UserSession(
-            pref.getString(KEY_USER_ID, "").toString(),
-            pref.getString(KEY_NAME, "").toString(),
-            pref.getString(KEY_TOKEN, "").toString(),
-            pref.getBoolean(KEY_LOG_STATUS, false)
-        )
-
-    fun logout() {
-        editor.apply {
-            remove(KEY_USER_ID)
-            remove(KEY_NAME)
-            remove(KEY_TOKEN)
-            putBoolean(KEY_LOG_STATUS, false)
-            apply()
+    suspend fun saveUserToken(token: String) {
+        dataStore.edit { preferences ->
+            preferences[TOKEN_KEY] = token
         }
     }
 

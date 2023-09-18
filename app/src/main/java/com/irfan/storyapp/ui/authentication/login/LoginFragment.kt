@@ -3,32 +3,34 @@ package com.irfan.storyapp.ui.authentication.login
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.irfan.storyapp.MainActivity
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.ExperimentalPagingApi
 import com.irfan.storyapp.R
-import com.irfan.storyapp.data.model.local.UserSession
-import com.irfan.storyapp.data.preferences.UserPreferences
 import com.irfan.storyapp.databinding.FragmentLoginBinding
 import com.irfan.storyapp.ui.authentication.register.RegisterFragment
 import com.irfan.storyapp.ui.home.HomeFragment
+import com.irfan.storyapp.ui.main.MainActivity
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
+@ExperimentalPagingApi
 class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
 
-    private val TAG = LoginFragment::class.java.simpleName
+    private val TAG = this::class.java.simpleName
 
     private lateinit var loadingDialog: AlertDialog
+    private var loginJob: Job = Job()
 
-    private lateinit var loginViewModel: LoginViewModel
-    private lateinit var userPreferences: UserPreferences
+    private val loginViewModel: LoginViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,8 +38,6 @@ class LoginFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
-        userPreferences = UserPreferences(requireContext())
-        initViewModel()
         return binding.root
     }
 
@@ -91,61 +91,39 @@ class LoginFragment : Fragment() {
     }
 
     private fun doLogin(email: String, password: String) {
-        loginViewModel.apply {
-            login(email, password)
-            user.observe(viewLifecycleOwner) {
-                if (it != null) {
-                    val currentUser = UserSession(
-                        it.name,
-                        it.userId,
-                        it.token,
-                        true
-                    )
-                    userPreferences.setUser(currentUser)
+        setLoadingState(true)
+        lifecycleScope.launchWhenResumed {
+            if (loginJob.isActive) loginJob.cancel()
 
-                    AlertDialog.Builder(requireContext()).apply {
-                        setTitle("Login Successfully")
-                        setMessage("Logged in as ${currentUser.name}")
-                        setPositiveButton("OK") { _, _ ->
-                            (activity as MainActivity).moveToFragment(HomeFragment())
+            loginJob = launch {
+                loginViewModel.login(email, password).collect { result ->
+                    result.onSuccess { response ->
+                        setLoadingState(false)
+                        response.loginResult.token.let { token ->
+                            loginViewModel.saveUserToken(token)
+                            AlertDialog.Builder(requireContext()).apply {
+                                setTitle("Login Successfully")
+                                setMessage("Logged in as ${response.loginResult.name}")
+                                setPositiveButton("OK") { _, _ ->
+                                    (activity as MainActivity).moveToFragment(HomeFragment())
+                                }
+                                create()
+                                show()
+                            }
                         }
-                        create()
-                        show()
+
                     }
-                }
-            }
-        }
-    }
-
-    private fun initViewModel() {
-        loginViewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.NewInstanceFactory()
-        )[LoginViewModel::class.java]
-
-        loginViewModel.apply {
-            message.observe(viewLifecycleOwner) {
-                Log.d(TAG, "Message = $it")
-            }
-            isLoading.observe(viewLifecycleOwner) {
-                if (it) {
-                    loadingDialog.show()
-                    binding.loginBtn.textIsEnabled = getString(R.string.str_please_wait) + "..."
-                } else {
-                    loadingDialog.dismiss()
-                    binding.loginBtn.textIsEnabled = getString(R.string.str_sign_in)
-                }
-            }
-            error.observe(viewLifecycleOwner) {
-                if (it) {
-                    AlertDialog.Builder(requireContext()).apply {
-                        setTitle(getString(R.string.str_login_failed))
-                        setMessage("Please try again later !")
-                        setPositiveButton("OK") { dialog, _ ->
-                            dialog.cancel()
+                    result.onFailure {
+                        setLoadingState(false)
+                        AlertDialog.Builder(requireContext()).apply {
+                            setTitle(getString(R.string.str_login_failed))
+                            setMessage("Please try again later !")
+                            setPositiveButton("OK") { dialog, _ ->
+                                dialog.cancel()
+                            }
+                            create()
+                            show()
                         }
-                        create()
-                        show()
                     }
                 }
             }
@@ -167,5 +145,15 @@ class LoginFragment : Fragment() {
             setCancelable(false)
         }
         loadingDialog = loadingDialogBuilder.create()
+    }
+
+    private fun setLoadingState(isLoading: Boolean) {
+        if (isLoading) {
+            loadingDialog.show()
+            binding.loginBtn.textIsEnabled = getString(R.string.str_please_wait) + "..."
+        } else {
+            loadingDialog.dismiss()
+            binding.loginBtn.textIsEnabled = getString(R.string.str_sign_in)
+        }
     }
 }

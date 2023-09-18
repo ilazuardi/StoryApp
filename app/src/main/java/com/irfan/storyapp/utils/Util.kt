@@ -1,4 +1,4 @@
-package com.irfan.storyapp.util
+package com.irfan.storyapp.utils
 
 import android.content.ContentResolver
 import android.content.Context

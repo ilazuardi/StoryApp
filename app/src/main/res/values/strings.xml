@@ -30,4 +30,12 @@
     <string name="str_please_wait">Please wait</string>
     <string name="str_data_being_processed">Your data is being processed</string>
     <string name="str_login_failed">Login Failed</string>
+    <string name="home">Home</string>
+    <string name="location">Location</string>
+    <string name="date_format_example">00/00/00</string>
+    <string name="retry">Retry</string>
+    <string name="activate_location_msg">You need to activate your location services !</string>
+    <string name="alert_empty_field_desc">Please fill this description box !</string>
+    <string name="iv_data_is_empty">Image for Data Empty</string>
+    <string name="str_stories_is_empty">Stories is empty or error</string>
 </resources>

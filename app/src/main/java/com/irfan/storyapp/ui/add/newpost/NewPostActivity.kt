@@ -6,25 +6,35 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.ExperimentalPagingApi
 import com.bumptech.glide.Glide
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.irfan.storyapp.R
 import com.irfan.storyapp.data.model.remote.story.add.NewStoryResponse
 import com.irfan.storyapp.data.network.ApiConfig
-import com.irfan.storyapp.data.preferences.UserPreferences
 import com.irfan.storyapp.databinding.ActivityNewPostBinding
-import com.irfan.storyapp.util.Util
-import com.irfan.storyapp.util.Util.reduceFileImage
+import com.irfan.storyapp.utils.Util
+import com.irfan.storyapp.utils.Util.reduceFileImage
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
@@ -32,14 +42,22 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
 
+@ExperimentalPagingApi
 class NewPostActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityNewPostBinding
 
     private lateinit var currentPath: String
-    private lateinit var pref: UserPreferences
 
     private var getFile: File? = null
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    private val newPostViewModel: NewPostViewModel by viewModels()
+
+    private var token: String = ""
+
+    private var location: Location? = null
 
     companion object {
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
@@ -51,11 +69,19 @@ class NewPostActivity : AppCompatActivity() {
         binding = ActivityNewPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        pref = UserPreferences(this)
         supportActionBar?.apply {
             title = "Add Story"
             show()
-            initView()
+        }
+        initView()
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        lifecycleScope.launchWhenCreated {
+            launch {
+                newPostViewModel.getUserToken().collect() { userToken ->
+                    if (!userToken.isNullOrEmpty()) token = userToken
+                }
+            }
         }
         playAnimation()
     }
@@ -79,6 +105,13 @@ class NewPostActivity : AppCompatActivity() {
             cameraAddBtn.setOnClickListener { startCamera() }
             galleryAddBtn.setOnClickListener { startGallery() }
             postAddBtn.setOnClickListener { addStory() }
+            smLocation.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    getLastestLocation()
+                } else {
+                    location = null
+                }
+            }
         }
     }
 
@@ -110,6 +143,40 @@ class NewPostActivity : AppCompatActivity() {
         galleryIntentLauncher.launch(chooser)
     }
 
+    private fun getLastestLocation() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            // Location permission granted
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    this.location = location
+                } else {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.activate_location_msg),
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    binding.smLocation.isChecked = false
+                }
+            }
+        } else {
+            // Location permission denied
+            requestPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
+
+    private fun allPermissionGranted() = REQUIRED_PERMISSIONS.all {
+        ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
+    }
+
     private val cameraIntentLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
@@ -139,56 +206,78 @@ class NewPostActivity : AppCompatActivity() {
         }
     }
 
-    private fun allPermissionGranted() = REQUIRED_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        when {
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> {
+                getLastestLocation()
+            }
+            else -> {
+                Toast.makeText(
+                    this,
+                    getString(R.string.activate_location_msg),
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                binding.smLocation.isChecked = false
+            }
+        }
     }
 
     private fun addStory() {
-        if (getFile != null) {
-            val file = reduceFileImage(getFile as File)
-            val descriptionText = binding.descAddTiet.text.toString()
-            val description = descriptionText.toRequestBody("text/plain".toMediaType())
-            val requestImageFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
-            val imageMultipart: MultipartBody.Part = MultipartBody.Part.createFormData(
-                "photo",
-                file.name,
-                requestImageFile
-            )
 
-            val token = "Bearer ${pref.getUser().token}"
-            val service = ApiConfig.getApiService().postStory(token, imageMultipart, description)
-            service.enqueue(object : Callback<NewStoryResponse> {
-                override fun onResponse(
-                    call: Call<NewStoryResponse>,
-                    response: Response<NewStoryResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        val responseBody = response.body()
-                        if (responseBody != null && !responseBody.error) {
+        if (binding.descAddTiet.toString().isBlank()) {
+            binding.descAddTiet.error = getString(R.string.alert_empty_field_desc)
+            return
+        }
+
+        if (getFile != null) {
+            lifecycleScope.launchWhenCreated {
+                val file = reduceFileImage(getFile as File)
+                val descriptionText = binding.descAddTiet.text.toString()
+                val description = descriptionText.toRequestBody("text/plain".toMediaType())
+                val requestImageFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                val imageMultipart: MultipartBody.Part = MultipartBody.Part.createFormData(
+                    "photo",
+                    file.name,
+                    requestImageFile
+                )
+                var lon: RequestBody? = null
+                var lat: RequestBody? = null
+
+                if (location != null) {
+                    lon = location?.longitude.toString().toRequestBody("text/plain".toMediaType())
+                    lat = location?.latitude.toString().toRequestBody("text/plain".toMediaType())
+                }
+
+                newPostViewModel.uploadNewStory(token, imageMultipart, description, lat, lon).collect { result ->
+                    result.onSuccess { response ->
+                        if (!response.error) {
                             Toast.makeText(
                                 this@NewPostActivity,
-                                responseBody.message,
+                                response.message,
                                 Toast.LENGTH_LONG
                             ).show()
                             onBackPressed()
                         } else {
                             Toast.makeText(
                                 this@NewPostActivity,
-                                response.message(),
+                                response.message,
                                 Toast.LENGTH_LONG
                             ).show()
                         }
                     }
+                    result.onFailure { t ->
+                        Toast.makeText(this@NewPostActivity, t.message.toString(), Toast.LENGTH_LONG)
+                            .show()
+                    }
                 }
 
-                override fun onFailure(call: Call<NewStoryResponse>, t: Throwable) {
-                    Toast.makeText(this@NewPostActivity, t.message.toString(), Toast.LENGTH_LONG)
-                        .show()
-                }
-
-            })
+            }
         } else {
             Toast.makeText(this, "Please input a picture first", Toast.LENGTH_LONG).show()
+            return
         }
 
     }

@@ -30,4 +30,7 @@
     <string name="str_please_wait">Please wait</string>
     <string name="str_data_being_processed">Your data is being processed</string>
     <string name="str_login_failed">Login Failed</string>
+    <string name="home">Home</string>
+    <string name="location">Location</string>
+    <string name="date_format_example">00/00/00</string>
 </resources>
